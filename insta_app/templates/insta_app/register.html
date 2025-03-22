@@ -1,0 +1,40 @@
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: white;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="row w-75 shadow-lg rounded overflow-hidden bg-black text-white">
+        <!-- Left Section -->
+        <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center p-5">
+            <!-- Add content or image here if needed -->
+        </div>
+
+        <!-- Right Section (Register Form) -->
+        <div class="col-md-6 d-flex align-items-center justify-content-center p-4">
+            <div class="card w-100" style="max-width: 400px;">
+                <div class="card-body">
+                    <h2 class="text-center text-dark mb-4">Register</h2>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                    <p class="text-center mt-3 text-muted">Already have an account? 
+                        <a href="{% url 'insta_app:login' %}" class="text-primary">Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

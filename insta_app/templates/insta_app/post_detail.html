@@ -1,0 +1,53 @@
+{% extends 'insta_app/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <!-- Post Header -->
+        <div class="card-header d-flex align-items-center">
+            <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle me-2" width="40" height="40">
+            <span class="fw-bold">{{ post.user.username }}</span>
+        </div>
+
+        <!-- Post Image -->
+        <img src="{{ post.image.url }}" class="card-img-top" alt="Post Image">
+
+        <!-- Post Content -->
+        <div class="card-body">
+            <p class="card-text">{{ post.caption }}</p>
+
+            <!-- Like Button & Actions -->
+            <div class="d-flex align-items-center mb-2">
+                <form action="{% url 'insta_app:like_post' post.id %}" method="post" class="me-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link p-0 border-0">
+                        {% if post.has_liked %}
+                        <i class="fas fa-heart text-danger fs-4"></i>
+                        {% else %}
+                        <i class="far fa-heart text-dark fs-4"></i>
+                        {% endif %}
+                    </button>
+                </form>
+                <i class="far fa-comment fs-4 me-3"></i>
+                <i class="far fa-share-square fs-4"></i>
+            </div>
+
+            <p class="mb-1"><strong>{{ post.like_set.count }}</strong> likes</p>
+
+            <!-- Comments Section -->
+            <div class="comments">
+                {% for comment in post.comment_set.all %}
+                <p class="mb-1"><strong>{{ comment.user.username }}</strong>: {{ comment.text }}</p>
+                {% endfor %}
+                
+                <!-- Add Comment Form -->
+                <form action="{% url 'insta_app:add_comment' post.id %}" method="post" class="mt-2 d-flex">
+                    {% csrf_token %}
+                    <input type="text" name="text" class="form-control me-2" placeholder="Add a comment..." required>
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

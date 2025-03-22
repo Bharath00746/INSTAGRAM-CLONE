@@ -1,0 +1,84 @@
+{% extends 'insta_app/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {% for post in posts %}
+    <div class="card shadow-sm mb-4 mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+            <!-- Post Header -->
+            <div class="d-flex align-items-center">
+                <a href="https://instagram.com/yourprofile" target="_blank">
+                    <i class="fab fa-instagram fs-3 text-danger"></i>
+                </a>
+                <span class="ms-2 fw-bold">{{ post.user.username }}</span>
+
+                <!-- Follow Button -->
+                {% if user.is_authenticated and user != post.user %}
+                <form action="{% url 'insta_app:follow_user' post.user.id %}" method="post" class="ms-auto">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm {% if post.user.profile in user.profile.following.all %}btn-secondary{% else %}btn-primary{% endif %}">
+                        {% if post.user.profile in user.profile.following.all %}
+                        Following
+                        {% else %}
+                        Follow
+                        {% endif %}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Post Image -->
+            <img src="{{ post.image.url }}" alt="Post Image" class="img-fluid rounded mt-2">
+
+            <!-- Caption -->
+            <p class="mt-2">{{ post.caption }}</p>
+
+            <!-- Post Actions -->
+            <div class="d-flex align-items-center mt-2">
+                <form action="{% url 'insta_app:like_post' post.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn p-0 border-0">
+                        {% if post.has_liked %}
+                        <i class="fas fa-heart text-danger fs-5"></i>
+                        {% else %}
+                        <i class="far fa-heart text-dark fs-5"></i>
+                        {% endif %}
+                    </button>
+                    <span class="ms-1">{{ post.like_set.count }} likes</span>
+                </form>
+
+                <i class="far fa-comment ms-4 fs-5 text-dark" onclick="toggleComments('{{ post.id }}')" style="cursor: pointer;">
+                    <span class="ms-1">{{ post.comment_set.count }}</span>
+                </i>
+
+                <i class="far fa-share-square ms-4 fs-5 text-dark"></i>
+            </div>
+
+            <!-- Comment Section -->
+            <div class="mt-2" id="comments-{{ post.id }}" style="display: none;">
+                {% for comment in post.comment_set.all %}
+                <p class="mb-1"><strong>{{ comment.user.username }}</strong>: {{ comment.text }}</p>
+                {% endfor %}
+
+                <form action="{% url 'insta_app:add_comment' post.id %}" method="post" class="d-flex mt-2">
+                    {% csrf_token %}
+                    <input type="text" name="text" class="form-control form-control-sm" placeholder="Add a comment..." required>
+                    <button type="submit" class="btn btn-primary btn-sm ms-2">Post</button>
+                </form>
+            </div>
+
+            <!-- Post Time -->
+            <p class="text-muted small mt-2">Posted on {{ post.created_at }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleComments(postId) {
+        const commentSection = document.getElementById('comments-' + postId);
+        commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+
+{% endblock %}
